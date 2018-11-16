@@ -6,8 +6,10 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
     public static func register(with registrar: FlutterPluginRegistrar) {
         // add own channel
         super.setChannels(with: registrar,
+                          instance:SwiftAwareframeworkCorePlugin(),
                           methodChannelName: "awareframework_core/method",
-                          eventChannelName: "awareframework_core/event")
+                          eventChannelName: "awareframework_core/event"
+                          )
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -22,7 +24,7 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
     
     open override func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         // your code here
-        super.start(call, result: result)
+        super.sync(call, result: result)
     }
     
     // /** handling sample */
@@ -37,11 +39,13 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
 
 open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
-    public static func setChannels(with registrar: FlutterPluginRegistrar, methodChannelName:String, eventChannelName:String) {
+    public static func setChannels(with registrar: FlutterPluginRegistrar,
+                                   instance:FlutterPlugin & FlutterStreamHandler,
+                                   methodChannelName:String, eventChannelName:String) {
         // add own channel
         let channel = FlutterMethodChannel(name: methodChannelName, binaryMessenger: registrar.messenger())
         let stream = FlutterEventChannel(name: eventChannelName,    binaryMessenger: registrar.messenger())
-        let instance = SwiftAwareframeworkCorePlugin()
+        // let  = SwiftAwareframeworkCorePlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         stream.setStreamHandler(instance)
     }
@@ -52,6 +56,7 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     public var streamHandlers:Array<StreamHandler> = Array<StreamHandler>();
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        self.beginHandle(call, result: result)
         if(call.method == "start"){
             self.start(call, result: result)
         }else if(call.method == "stop"){
@@ -65,6 +70,15 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         }else if(call.method == "is_enable"){
             self.isEnable(call, result: result)
         }
+        self.endHandle(call, result: result)
+    }
+    
+    open func beginHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
+    }
+    
+    open func endHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
     }
     
     open func start(_ call: FlutterMethodCall, result: @escaping FlutterResult){
@@ -142,4 +156,3 @@ public class StreamHandler{
         self.eventSink = eventSink
     }
 }
-

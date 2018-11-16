@@ -14,7 +14,7 @@ $ flutter create --org com.awareframework.sample --template=plugin -i swift -a k
 2. Add the awareframework_core into your pubspec.yaml
 ```yaml
 dependencies:
-  awareframework__core:
+  awareframework_core:
 ```
 You can get more information about the package installation via the following [link](https://flutter.io/docs/development/packages-and-plugins/using-packages).
 
@@ -37,7 +37,7 @@ class SampleCard extends StatefulWidget {
   SampleCard({Key key, this.sensor, this.config}) : super(key: key);
 
   SampleSensor sensor;
-  SampleSensorConfig config;
+  AwareSensorConfig config;
 
   @override
   SampleCardState createState() => new SampleCardState();
@@ -49,7 +49,7 @@ class SampleCardState extends State<ASampleCard> {
   void initState() {
     super.initState();
     if (widget.sensor == null) {
-      widget.sensor = new AccelerometerSensor(AccelerometerSensor._myMethod, AccelerometerSensor._myStream);
+      widget.sensor = new SampleSensor(SampleSensor._myMethod, SampleSensor._myStream);
     }
     widget.sensor.receiveBroadcastStream("on_data_changed").listen((dynamic event) {
         var result = event;
@@ -80,6 +80,17 @@ class SampleCardState extends State<ASampleCard> {
 ```
 
 ### iOS
+
+1. Add following code into ios/awareframework_sample.podspec
+```console
+  # update author information and url
+  s.dependency 'awareframework_core'
+  s.ios.deployment_target = '10.0'
+  # add other dependency
+```
+2. Run `pod install` at example/ios  
+
+3. Open iOS project (example/ios/Runner.xcworkspace) and change a deplyment target to 10.0
 ```swift
 import Flutter
 import UIKit
@@ -154,10 +165,9 @@ author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiya
 homepage: http://www.awareframework.com
 ```
 
-### Dry Run
+### Publish
 ```console
 $ flutter packages pub publish --dry-run
+$ flutter packages pub publish
 ```
-
-### 
 

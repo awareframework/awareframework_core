@@ -168,9 +168,8 @@ class AwareCardState extends State<AwareCard> {
       widget.sensor = new AwareSensorCore(
           AwareSensorCore._coreChannel,
           AwareSensorCore._coreStream );
+      // print("${widget.sensor}: init sensor");
     }
-
-
   }
 
   Widget getContentWidget(){
@@ -182,6 +181,7 @@ class AwareCardState extends State<AwareCard> {
   }
 
   Widget getSensorController(){
+
     return Column(
       //mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
