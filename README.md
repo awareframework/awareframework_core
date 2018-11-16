@@ -123,12 +123,41 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
 
 ### Eaxample App
 ```dart
+import 'package:awareframework_core/awareframework_core.dart';
+
+class _MyAppState extends State<MyApp> {
+  
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      home: new Scaffold(
+          appBar: new AppBar(
+            title: const Text('Plugin Example App'),
+          ),
+          body: new SampleCard(title:"Sample Card", )
+      ),
+    );
+  }
+}
 
 ```
 
-## Add README
-
-## Add Tests
-
 ## Publishing the your plugin
+### Add author and homepage information into pubspec.yaml
+```yaml
+author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiyama@oulu.fi>
+homepage: http://www.awareframework.com
+```
+
+### Dry Run
+```console
+$ flutter packages pub publish --dry-run
+```
+
+### 
 
