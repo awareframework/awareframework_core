@@ -52,7 +52,7 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public var sensor:AwareSensor?
     public var streamHandlers:Array<StreamHandler> = Array<StreamHandler>();
-    public var startCallEventHandler:AwareFlutterPluginSensorInitializationHandler?
+    public var initializationCallEventHandler:AwareFlutterPluginSensorInitializationHandler?
     public var methodEventHandler:AwareFlutterPluginMethodHandler?
     
     @objc(handleMethodCall:result:) public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -61,7 +61,7 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
             methodHandler.beginMethodHandle(call, result: result)
         }
         if call.method == "init"{
-            if let handler = self.startCallEventHandler {
+            if let handler = self.initializationCallEventHandler {
                 sensor = handler.initializeSensor(call, result: result)
             }
         }else if call.method == "start" {
