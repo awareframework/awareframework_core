@@ -18,6 +18,11 @@ class AwareSensorCore {
     this._stream  = _coreStream;
   }
 
+  void setSensorChannels(MethodChannel channel, EventChannel stream){
+    this._channel = channel;
+    this._stream  = stream;
+  }
+
   void setMethodChannel(MethodChannel channel){
     this._channel = channel;
   }

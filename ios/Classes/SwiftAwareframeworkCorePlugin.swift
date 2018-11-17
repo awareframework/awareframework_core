@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import com_aware_ios_sensor_core
 
-public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin {
+public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorStartController {
     public static func register(with registrar: FlutterPluginRegistrar) {
         // add own channel
         super.setChannels(with: registrar,
@@ -12,24 +12,14 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
                           )
     }
     
-    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // your code here
-        super.handle(call, result: result)
+    public func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor {
+        return AwareSensor();
     }
     
-    open override func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // your code here
-        super.start(call, result: result)
-    }
-    
-    open override func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // your code here
-        super.sync(call, result: result)
-    }
     
     // /** handling sample */
     //    func opnSomeChanged(){
-    //        for handler in self.streamHandlers {
+    //        for handler in sController.streamHandlers {
     //            if handler.eventName == "eventName" {
     //                handler.eventSink(nil)
     //            }
@@ -37,8 +27,18 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
     //    }
 }
 
+//////////////////
+public protocol AwareFlutterPluginSensorStartController {
+    func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor
+}
+
+public protocol AwareFlutterPluginMethodHandler{
+    func beginMethodHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult)
+    func endMethodHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult)
+}
+
 open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
-    
+
     public static func setChannels(with registrar: FlutterPluginRegistrar,
                                    instance:FlutterPlugin & FlutterStreamHandler,
                                    methodChannelName:String, eventChannelName:String) {
@@ -50,71 +50,66 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         stream.setStreamHandler(instance)
     }
     
-    //////////////////
-    
     public var sensor:AwareSensor?
     public var streamHandlers:Array<StreamHandler> = Array<StreamHandler>();
+    public var sensorController:AwareFlutterPluginSensorStartController?
+    public var methodEventHandler:AwareFlutterPluginMethodHandler?
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        self.beginHandle(call, result: result)
-        if(call.method == "start"){
-            self.start(call, result: result)
-        }else if(call.method == "stop"){
-            self.stop(call, result: result)
-        }else if(call.method == "sync"){
+    @objc(handleMethodCall:result:) public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
+        if let methodHandler = self.methodEventHandler{
+            methodHandler.beginMethodHandle(call, result: result)
+        }
+        
+        if call.method == "start" {
+            if let sController = self.sensorController {
+                sensor = sController.start(call, result: result)
+            }
+        }else if call.method == "sync" {
             self.sync(call, result: result)
-        }else if(call.method == "enable"){
+        }else if call.method == "stop" {
+            self.stop(call, result: result)
+        }else if call.method == "enable" {
             self.enable(call, result: result)
-        }else if(call.method == "disable"){
+        }else if call.method == "disable" {
             self.disable(call, result: result)
-        }else if(call.method == "is_enable"){
+        }else if call.method == "is_enable" {
             self.isEnable(call, result: result)
         }
-        self.endHandle(call, result: result)
-    }
-    
-    open func beginHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
-    }
-    
-    open func endHandle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
-    }
-    
-    open func start(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            uwSensor.start()
+        if let methodHandler = self.methodEventHandler{
+            methodHandler.endMethodHandle(call, result: result)
         }
     }
     
-    open func stop(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            uwSensor.stop()
+    public func stop(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            uwSensor.stop();
         }
     }
     
-    open func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            uwSensor.sync()
+    public func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            uwSensor.sync();
         }
     }
     
-    ////////////////////////////
-    open func enable(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            uwSensor.enable()
+    public func enable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            uwSensor.enable();
         }
     }
     
-    open func disable(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            uwSensor.disable()
+    public func disable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            uwSensor.disable();
         }
     }
     
-    open func isEnable(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        if let uwSensor = sensor {
-            result(uwSensor.isEnabled())
+    public func isEnable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            result(uwSensor.isEnabled());
         }
     }
     
