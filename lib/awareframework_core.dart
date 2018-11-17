@@ -8,16 +8,36 @@ class AwareSensorCore {
   static const MethodChannel _coreChannel = const MethodChannel('awareframework_core/method');
   static const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
 
+  /// method handling channel
+  /// e.g.,
+  ///   static const MethodChannel _channel
+  ///           = const MethodChannel('awareframework_core/method');
   MethodChannel _channel;
+
+  /// event handling channel
+  /// e.g.,
+  ///   static const EventChannel  _coreStream
+  ///           = const EventChannel('awareframework_core/event');
   EventChannel  _stream;
 
+  /// configuration of sensor
+  /// e.g.,
+  ///   var config = AwareSensorConfig(debug:true, label:"sample");
   AwareSensorConfig config;
 
+  ///
+  /// An initializer for AwareSensorCore.
+  /// e.g.,
+  /// var config = AwareSensorConfig(debug:true, label:"sample");
+  /// var sensor = AwareSensorCore(config);
+  ///
+  /// NOTE: If you are making a sensor, you have to set your own channels
+  /// by using setSensorChannels() after this initialization.
+  ///
   AwareSensorCore(config):this.convenience(config);
   AwareSensorCore.convenience(this.config){
     this._channel = _coreChannel;
     this._stream  = _coreStream;
-    init(config);
   }
 
   void setSensorChannels(MethodChannel channel, EventChannel stream){
@@ -25,43 +45,16 @@ class AwareSensorCore {
     this._stream  = stream;
   }
 
-  void setMethodChannel(MethodChannel channel){
-    this._channel = channel;
-  }
-
-  void setEventChannel(EventChannel stream){
-    this._stream = stream;
-  }
-
-  /// start sensing with a sensor configuration
-  /// //
-  ///   var config = AwareSensorConfig();
-  //    config
-  //      ..debug = true
-  //      ..dbHost = "api.awareframework.com"
-  //      ..label = "label_1";
-  //
-  Future<Null> init(AwareSensorConfig config) async {
-    try {
-      if(config == null){
-        await _channel.invokeMethod('init', null);
-      }else{
-        await _channel.invokeMethod('init', config.toMap());
-      }
-    } on PlatformException catch (e) {
-      print(e.message);
-    }
-  }
-
+  /// Start sensing
   Future<Null> start() async {
     try {
-      await _channel.invokeMethod('start', null);
+      await _channel.invokeMethod('start', config);
     } on PlatformException catch (e) {
       print(e.message);
     }
   }
 
-  /// stop sensing
+  /// Stop sensing
   Future<Null> stop () async {
     try {
       await _channel.invokeMethod('stop', null);
@@ -115,6 +108,12 @@ class AwareSensorCore {
 
 }
 
+///
+/// A configuration of AwareSensor
+///
+/// e.g.,
+///   var config = AwareSensorConfig(debug:true, label:"sample");
+///
 class AwareSensorConfig {
   bool enabled    = false;
   bool debug      = false;
@@ -125,13 +124,25 @@ class AwareSensorConfig {
   var dbPath = "aware";
   var dbHost;
 
+  AwareSensorConfig({
+    Key key,
+    this.debug,
+    this.enabled,
+    this.label,
+    this.deviceId,
+    this.dbEncryptionKey,
+    this.dbType,
+    this.dbPath,
+    this.dbHost
+  });
+
   Map<String,dynamic> toMap() {
     var config =
     {"enabled":enabled,
       "debug":debug,
       "label":label,
       "deviceId":deviceId,
-      "dbType":0,
+      "dbType":dbType,
       "dbPath":dbPath};
     if(dbEncryptionKey != null){
       config["dbEncryptionKey"] = dbEncryptionKey;
@@ -140,6 +151,7 @@ class AwareSensorConfig {
     return config;
   }
 }
+
 
 class AwareDbSyncManagerConfig{
   double syncInterval      = 1.0;

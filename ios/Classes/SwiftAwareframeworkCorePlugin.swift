@@ -3,7 +3,7 @@ import UIKit
 import com_aware_ios_sensor_core
 
 public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler {
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         // add own channel
         super.setChannels(with: registrar,
@@ -12,11 +12,11 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
                           eventChannelName: "awareframework_core/event"
                           )
     }
-    
+
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         return AwareSensor();
     }
-    
+
     // /** handling sample */
     //    func opnSomeChanged(){
     //        for handler in sController.streamHandlers {
@@ -45,7 +45,6 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         // add own channel
         let channel = FlutterMethodChannel(name: methodChannelName, binaryMessenger: registrar.messenger())
         let stream = FlutterEventChannel(name: eventChannelName,    binaryMessenger: registrar.messenger())
-        // let  = SwiftAwareframeworkCorePlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         stream.setStreamHandler(instance)
     }
@@ -60,11 +59,14 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         if let methodHandler = self.methodEventHandler{
             methodHandler.beginMethodHandle(call, result: result)
         }
-        if call.method == "init"{
+        
+        if self.sensor == nil {
             if let handler = self.initializationCallEventHandler {
                 sensor = handler.initializeSensor(call, result: result)
             }
-        }else if call.method == "start" {
+        }
+        
+        if call.method == "start" {
             self.start(call, result: result)
         }else if call.method == "sync" {
             self.sync(call, result: result)
