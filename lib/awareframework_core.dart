@@ -48,7 +48,11 @@ class AwareSensorCore {
   /// Start sensing
   Future<Null> start() async {
     try {
-      await _channel.invokeMethod('start', config);
+      if (config == null){
+        await _channel.invokeMethod('start', null);
+      }else{
+        await _channel.invokeMethod('start', config.toMap());
+      }
     } on PlatformException catch (e) {
       print(e.message);
     }
