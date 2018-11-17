@@ -12,7 +12,7 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
                           )
     }
     
-    public func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor {
+    public func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         return AwareSensor();
     }
     
@@ -28,7 +28,7 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
 
 //////////////////
 public protocol AwareFlutterPluginSensorStartCallHandler {
-    func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor
+    func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor?
 }
 
 public protocol AwareFlutterPluginMethodHandler{
@@ -85,6 +85,7 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     public func stop(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             uwSensor.stop();
+            self.sensor = nil
         }
     }
     
