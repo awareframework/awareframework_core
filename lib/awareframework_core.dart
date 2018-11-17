@@ -12,12 +12,20 @@ class AwareSensorCore {
   MethodChannel _channel;
   EventChannel  _stream;
 
-  AwareSensorCore(this._channel, this._stream){
-    if(this._channel == null){
-      this._channel = _coreChannel;
-      this._stream  = _coreStream;
-    }
+  AwareSensorCore():this.convenience();
+  AwareSensorCore.convenience(){
+    this._channel = _coreChannel;
+    this._stream  = _coreStream;
   }
+
+  void setMethodChannel(MethodChannel channel){
+    this._channel = channel;
+  }
+
+  void setEventChannel(EventChannel stream){
+    this._stream = stream;
+  }
+
 
   /// start sensing with a sensor configuration
   /// //
@@ -165,10 +173,7 @@ class AwareCardState extends State<AwareCard> {
   void initState() {
     super.initState();
     if(widget.sensor == null){
-      widget.sensor = new AwareSensorCore(
-          AwareSensorCore._coreChannel,
-          AwareSensorCore._coreStream );
-      // print("${widget.sensor}: init sensor");
+      widget.sensor = new AwareSensorCore();
     }
   }
 
