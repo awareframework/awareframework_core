@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 
 class AwareSensorCore {
 
-  // 'awareframework_core';
   static const MethodChannel _coreChannel = const MethodChannel('awareframework_core/method');
   static const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
 
   MethodChannel _channel;
   EventChannel  _stream;
 
-  AwareSensorCore():this.convenience();
-  AwareSensorCore.convenience(){
+  AwareSensorConfig config;
+
+  AwareSensorCore(config):this.convenience(config);
+  AwareSensorCore.convenience(this.config){
     this._channel = _coreChannel;
     this._stream  = _coreStream;
+    init(config);
   }
 
   void setSensorChannels(MethodChannel channel, EventChannel stream){
@@ -31,7 +33,6 @@ class AwareSensorCore {
     this._stream = stream;
   }
 
-
   /// start sensing with a sensor configuration
   /// //
   ///   var config = AwareSensorConfig();
@@ -40,13 +41,21 @@ class AwareSensorCore {
   //      ..dbHost = "api.awareframework.com"
   //      ..label = "label_1";
   //
-  Future<Null> start(AwareSensorConfig config) async {
+  Future<Null> init(AwareSensorConfig config) async {
     try {
       if(config == null){
-        await _channel.invokeMethod('start', null);
+        await _channel.invokeMethod('init', null);
       }else{
-        await _channel.invokeMethod('start', config.toMap());
+        await _channel.invokeMethod('init', config.toMap());
       }
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future<Null> start() async {
+    try {
+      await _channel.invokeMethod('start', null);
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -62,13 +71,9 @@ class AwareSensorCore {
   }
 
   /// sync local-database with remote-database
-  Future<Null> sync (AwareDbSyncManagerConfig config) async {
+  Future<Null> sync (bool force) async {
     try {
-      if(config == null){
-        await _channel.invokeMethod('sync', null);
-      }else{
-        await _channel.invokeMethod('sync', config.toMap());
-      }
+      await _channel.invokeMethod('sync', force);
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -156,14 +161,11 @@ class AwareDbSyncManagerConfig{
 
 }
 
-
 /// A widget for Accelerometer Sensor
 class AwareCard extends StatefulWidget {
-  AwareCard({Key key, this.contentWidget, this.title, this.sensor, this.sensorConfig, this.syncConfig}) : super(key: key);
+  AwareCard({Key key, this.contentWidget, this.title, this.sensor}) : super(key: key);
   Widget contentWidget;
   AwareSensorCore sensor;
-  AwareSensorConfig sensorConfig;
-  AwareDbSyncManagerConfig syncConfig;
   String title;
 
   @override
@@ -177,9 +179,6 @@ class AwareCardState extends State<AwareCard> {
   @override
   void initState() {
     super.initState();
-    if(widget.sensor == null){
-      widget.sensor = new AwareSensorCore();
-    }
   }
 
   Widget getContentWidget(){
@@ -201,7 +200,7 @@ class AwareCardState extends State<AwareCard> {
             setState(() {
               _isSensing = isOn;
               if (isOn) {
-                widget.sensor.start(widget.sensorConfig);
+                widget.sensor.start();
               }else{
                 widget.sensor.stop();
               }
