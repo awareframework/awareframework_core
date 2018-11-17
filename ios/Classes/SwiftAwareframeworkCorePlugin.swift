@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import com_aware_ios_sensor_core
 
-public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorStartController {
+public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorStartCallHandler {
     public static func register(with registrar: FlutterPluginRegistrar) {
         // add own channel
         super.setChannels(with: registrar,
@@ -16,7 +16,6 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
         return AwareSensor();
     }
     
-    
     // /** handling sample */
     //    func opnSomeChanged(){
     //        for handler in sController.streamHandlers {
@@ -28,7 +27,7 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
 }
 
 //////////////////
-public protocol AwareFlutterPluginSensorStartController {
+public protocol AwareFlutterPluginSensorStartCallHandler {
     func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor
 }
 
@@ -52,7 +51,7 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public var sensor:AwareSensor?
     public var streamHandlers:Array<StreamHandler> = Array<StreamHandler>();
-    public var sensorController:AwareFlutterPluginSensorStartController?
+    public var startCallEventHandler:AwareFlutterPluginSensorStartCallHandler?
     public var methodEventHandler:AwareFlutterPluginMethodHandler?
     
     @objc(handleMethodCall:result:) public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -62,8 +61,8 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         }
         
         if call.method == "start" {
-            if let sController = self.sensorController {
-                sensor = sController.start(call, result: result)
+            if let handler = self.startCallEventHandler {
+                sensor = handler.start(call, result: result)
             }
         }else if call.method == "sync" {
             self.sync(call, result: result)
