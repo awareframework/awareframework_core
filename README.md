@@ -28,22 +28,34 @@ class SampleSensor extends AwareSensorCore {
     static const EventChannel  _sampleStream  = const EventChannel('awareframework_sample/event');
     AccelerometerSensor(MethodChannel _sampleMethod, EventChannel _sampleStream) : super(_sampleMethod, _sampleStream);
     
-    /// overwrite methos and config classes.
+      /// Init Accelerometer Sensor with AccelerometerSensorConfig
+      SampleSensor(AwareSensorConfig config):this.convenience(config);
+      SampleSensor.convenience(config) : super(config){
+        /// Set sensor method & event channels
+        super.setSensorChannels(_sampleMethod, _sampleStream);
+      }
+    
+      /// A sensor observer instance
+      Stream<Map<String,dynamic>> get onDataChanged {
+         return super.receiveBroadcastStream("on_data_changed")
+                     .map(
+                        (dynamic event) => Map.from(event)
+                     );
+      }
     /// ...
 }
 
 /// Make an AwareWidget
 class SampleCard extends StatefulWidget {
-  SampleCard({Key key, this.sensor, this.config}) : super(key: key);
+  SampleCard({Key key, @required this.sensor}) : super(key: key);
 
   SampleSensor sensor;
-  AwareSensorConfig config;
 
   @override
   SampleCardState createState() => new SampleCardState();
 }
 
-class SampleCardState extends State<ASampleCard> {
+class SampleCardState extends State<SampleCard> {
   var data;
   @override
   void initState() {
@@ -51,8 +63,7 @@ class SampleCardState extends State<ASampleCard> {
     if (widget.sensor == null) {
       widget.sensor = new SampleSensor(SampleSensor._myMethod, SampleSensor._myStream);
     }
-    widget.sensor.receiveBroadcastStream("on_data_changed").listen((dynamic event) {
-        var result = event;
+    widget.sensor.receiveBroadcastStream("on_data_changed").listen((event) {
         setState((){
           data = event;
         });
@@ -67,8 +78,7 @@ class SampleCardState extends State<ASampleCard> {
     return new AwareCard(
       contentWidget: Text(data),
       title: "Sample",
-      sensor: widget.sensor,
-      sensorConfig: widget.config,
+      sensor: widget.sensor
     );
   }
 }
@@ -96,34 +106,22 @@ import Flutter
 import UIKit
 import com_aware_ios_sensor_core
 
-public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugin {
+public class SwiftAwareframeworkSamplePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler {
     public static func register(with registrar: FlutterPluginRegistrar) {
         // add own channel
         super.setChannels(with: registrar,
-                          methodChannelName: "awareframework_core/method",
-                          eventChannelName: "awareframework_core/event")
+                          instance:SwiftAwareframeworkSamplePlugin(),
+                          methodChannelName: "awareframework_sample/method",
+                          eventChannelName: "awareframework_sample/event")
     }
     
-    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        print("handle")
-        super.handle(call, result: result)
+    public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
+        // init sensor
+        return AwareSensor();
     }
     
-    open override func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // your code here
-        print("start")
-        super.start(call, result: result)
-    }
-    
-    open override func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // your code here
-        print("sync")
-        super.start(call, result: result)
-    }
-    
-    // /** handling sample */
-    //    func onChange(){
-    //        for handler in self.streamHandlers {
+    //    func opnSomeChanged(){
+    //        for handler in sController.streamHandlers {
     //            if handler.eventName == "eventName" {
     //                handler.eventSink(nil)
     //            }
@@ -138,9 +136,18 @@ import 'package:awareframework_core/awareframework_core.dart';
 
 class _MyAppState extends State<MyApp> {
   
+  AccelerometerSensor sensor;
+  AccelerometerSensorConfig config;
+    
   @override
   void initState() {
     super.initState();
+    config = AccelerometerSensorConfig()
+      ..debug = true
+      ..label = "label";
+    
+    sensor = new SampleSensor(config);
+
   }
 
   @override
@@ -150,7 +157,7 @@ class _MyAppState extends State<MyApp> {
           appBar: new AppBar(
             title: const Text('Plugin Example App'),
           ),
-          body: new SampleCard(title:"Sample Card", )
+          body: new AccelerometerCard(sensor: sensor)
       ),
     );
   }
