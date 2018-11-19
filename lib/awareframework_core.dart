@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class AwareSensorCore {
 
@@ -259,3 +260,89 @@ class AwareCardState extends State<AwareCard> {
   }
 }
 
+class LineSeriesData {
+  String id;
+  int time;
+  double value;
+  LineSeriesData(this.id, this.time, this.value);
+}
+
+class StreamLineSeriesChart extends StatelessWidget {
+
+  List<charts.Series> seriesList = List<charts.Series>();
+
+  StreamLineSeriesChart(this.seriesList);
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.LineChart(
+        seriesList,
+        animate: false
+    );
+  }
+
+  static void add({Key key, @required double data,
+    @required List<LineSeriesData> into,
+    @required String id,
+    @required int buffer}){
+    into.add(new LineSeriesData(id, into.length + 1, data));
+
+    if (into.length > buffer) {
+      for (int i = 0; i < buffer; i++){
+        into[i].time = into[i].time - 1;
+      }
+      into.removeAt(0);
+    }
+  }
+
+  /// Create one series with sample hard coded data.
+  static List<charts.Series<LineSeriesData, int>> createTimeSeriesData(List<LineSeriesData> x,
+      List<LineSeriesData> y,
+      List<LineSeriesData> z,) {
+
+    var data = List<charts.Series<LineSeriesData, int>>();
+
+    if (x.length == 0 && y.length==0 && z.length == 0 ){
+      data.add(new charts.Series<LineSeriesData, int>(
+        id: "line",
+        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        domainFn: (LineSeriesData sales, _) => sales.time,
+        measureFn: (LineSeriesData sales, _) => sales.value,
+        data: x,
+      ));
+      return data;
+    }
+
+    if (x.length > 0){
+      var id = x[0].id;
+      data.add(new charts.Series<LineSeriesData, int>(
+        id: id,
+        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        domainFn: (LineSeriesData sales, _) => sales.time,
+        measureFn: (LineSeriesData sales, _) => sales.value,
+        data: x,
+      ));
+    }
+    if (y.length > 0){
+      var id = x[0].id;
+      data.add(new charts.Series<LineSeriesData, int>(
+        id: id,
+        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+        domainFn: (LineSeriesData sales, _) => sales.time,
+        measureFn: (LineSeriesData sales, _) => sales.value,
+        data: y,
+      ));
+    }
+    if (z.length > 0){
+      var id = x[0].id;
+      data.add(new charts.Series<LineSeriesData, int>(
+        id: id,
+        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+        domainFn: (LineSeriesData sales, _) => sales.time,
+        measureFn: (LineSeriesData sales, _) => sales.value,
+        data: z,
+      ));
+    }
+    return data;
+  }
+}
