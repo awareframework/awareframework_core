@@ -8,14 +8,14 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'http://www.awareframework.com'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Yuuki Nishiyama' => 'yuuki.nishiyama@oulu.fi' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'com.aware.ios.sensor.core'
+  s.dependency 'com.awareframework.ios.sensor.core'
 
   s.ios.deployment_target = '10.0'
 end
