@@ -149,6 +149,15 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         }
         return nil;
     }
+    
+    public func getStreamHandler(name: String) -> StreamHandler? {
+        for handler in self.streamHandlers {
+            if handler.eventName == name {
+                return handler
+            }
+        }
+        return nil
+    }
 }
 
 public class StreamHandler{
