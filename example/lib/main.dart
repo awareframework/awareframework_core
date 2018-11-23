@@ -6,7 +6,12 @@ import 'package:awareframework_core/awareframework_core.dart';
 
 void main() => runApp(new MyApp());
 
+const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
+
 class MyApp extends StatefulWidget {
+
+  AwareSensorCore core = AwareSensorCore(null);
+
   @override
   _MyAppState createState() => new _MyAppState();
 }
@@ -22,7 +27,10 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-
+    widget.core.getBroadcastStream(_coreStream, "get_event", "abcd").listen((event){
+      print(event);
+    });
+    widget.core.cancelBroadcastStream("abcd");
   }
 
   @override

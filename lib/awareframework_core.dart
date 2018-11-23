@@ -7,7 +7,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 class AwareSensorCore {
 
   static const MethodChannel _coreChannel = const MethodChannel('awareframework_core/method');
-  static const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
+  // static const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
 
   /// method handling channel
   /// e.g.,
@@ -19,7 +19,7 @@ class AwareSensorCore {
   /// e.g.,
   ///   static const EventChannel  _coreStream
   ///           = const EventChannel('awareframework_core/event');
-  EventChannel  _stream;
+  // EventChannel  _stream;
 
   /// configuration of sensor
   /// e.g.,
@@ -38,12 +38,12 @@ class AwareSensorCore {
   AwareSensorCore(config):this.convenience(config);
   AwareSensorCore.convenience(this.config){
     this._channel = _coreChannel;
-    this._stream  = _coreStream;
+    // this._stream  = _coreStream;
   }
 
   void setSensorChannels(MethodChannel channel, EventChannel stream){
     this._channel = channel;
-    this._stream  = stream;
+    // this._stream  = stream;
   }
 
   /// Start sensing
@@ -101,15 +101,29 @@ class AwareSensorCore {
     }
   }
 
+  Future<Null> cancelBroadcastStream(String identifier) async {
+    try {
+      return await _channel.invokeMethod("cancel_broadcast_stream", {"id":identifier});
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
   /// https://medium.com/flutter-io/flutter-platform-channels-ce7f540a104e
   //    channel.receiveBroadcastStream().listen((dynamic event) {
   //      // print('Received event: $event');
   //    }, onError: (dynamic error) {
   //      // print('Received error: ${error.message}');
   //    });
-  Stream<dynamic> receiveBroadcastStream(String eventName){
-    return _stream.receiveBroadcastStream([eventName]);
+
+//  Stream<dynamic> receiveBroadcastStream(String eventName){
+//    return _stream.receiveBroadcastStream([eventName]);
+//  }
+
+  Stream<dynamic> getBroadcastStream(EventChannel eventChannel, String eventName, String identifier){
+    return eventChannel.receiveBroadcastStream({"name":eventName, "id":identifier});
   }
+
 
 }
 
@@ -158,7 +172,7 @@ class AwareSensorConfig {
 }
 
 
-class AwareDbSyncManagerConfig{
+class AwareDbSyncManagerConfig {
   double syncInterval      = 1.0;
   bool wifiOnly            = true;
   bool batteryChargingOnly = false;
@@ -191,8 +205,6 @@ class AwareCard extends StatefulWidget {
 
 class AwareCardState extends State<AwareCard> {
 
-  bool _isSensing  = false;
-
   @override
   void initState() {
     super.initState();
@@ -204,27 +216,6 @@ class AwareCardState extends State<AwareCard> {
     }else{
       return widget.contentWidget;
     }
-  }
-
-  Widget getSensorController(){
-
-    return Column(
-      //mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        // crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Switch(value: _isSensing, onChanged: (bool isOn) {
-            setState(() {
-              _isSensing = isOn;
-              if (isOn) {
-                widget.sensor.start();
-              }else{
-                widget.sensor.stop();
-              }
-            });
-          }),
-        ]
-    );
   }
 
   @override
@@ -241,12 +232,11 @@ class AwareCardState extends State<AwareCard> {
                 new Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    new Padding(
-                      padding: const EdgeInsets.only(top: 22.0, bottom: 8.0),
+                    Padding(
+                      padding: EdgeInsets.all(12.0),
                       child: new Text("${widget.title}", style:_biggerFont),
                     ),
                     getContentWidget(),
-                    getSensorController(),
                     new Divider()
                   ],
                 ),
@@ -256,8 +246,8 @@ class AwareCardState extends State<AwareCard> {
             )
         )
     );
-
   }
+
 }
 
 class LineSeriesData {
