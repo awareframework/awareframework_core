@@ -1,6 +1,6 @@
 name: awareframework_core
 description: awareframework_core provides core classes for developing your own sensor module on aware framework.
-version: 0.0.7
+version: 0.0.8
 author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiyama@oulu.fi>
 homepage: http://www.awareframework.com
 
@@ -30,6 +30,7 @@ flutter:
   # https://flutter.io/assets-and-images/#from-packages
   #
   # An image asset can refer to one or more resolution-specific "variants", see
+  
   # https://flutter.io/assets-and-images/#resolution-aware.
 
   # To add custom fonts to your plugin package, add a fonts section here,

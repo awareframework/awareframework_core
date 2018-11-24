@@ -9,7 +9,7 @@ public class SwiftAwareframeworkCorePlugin: AwareFlutterPluginCore, FlutterPlugi
         
         super.setMethodChannel(with: registrar,
                                instance: instance,
-                               channelNames: ["awareframework_core/method"])
+                               channelName: "awareframework_core/method")
         
         super.setEventChannels(with: registrar,
                                instance: instance,
@@ -45,12 +45,9 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public static func setMethodChannel(with registrar: FlutterPluginRegistrar,
                                    instance:FlutterPlugin & FlutterStreamHandler,
-                                   channelNames:[String]) {
-        for name in channelNames {
-            // add own channel
-            let channel = FlutterMethodChannel(name: name, binaryMessenger: registrar.messenger())
-            registrar.addMethodCallDelegate(instance, channel: channel)
-        }
+                                   channelName:String) {
+        let channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
+        registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
     public static func setEventChannels(with registrar: FlutterPluginRegistrar,
