@@ -154,8 +154,17 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         if let args = arguments as? Dictionary<String,Any> {
             if let eventName = args["name"] as? String , let id = args["id"] as? String {
+                //// check ID duplication
+                for h in streamHandlers {
+                    if h.identifier == id {
+                        return FlutterError.init(code:    "Duplicate ID Error (awareframework_core/event)",
+                                                 message: "Error: Duplicate stream handle ID (\(eventName):\(id)). You can not set duplicate ID into the same sensor.",
+                                                 details: nil)
+                    }
+                }
                 let handler = StreamHandler.init(eventName, events, id)
                 streamHandlers.append(handler)
+                
             }
         }
         return nil;
