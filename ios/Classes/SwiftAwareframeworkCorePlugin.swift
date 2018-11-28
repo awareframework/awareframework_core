@@ -111,6 +111,12 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
+            if let args = call.arguments as? Dictionary<String, Any> {
+                if let force = args["force"] as? Bool {
+                    uwSensor.sync(force: force)
+                    return
+                }
+            }
             uwSensor.sync();
         }
     }
@@ -135,9 +141,9 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public func cancelStreamHandler(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let args = call.arguments as? Dictionary<String,Any> {
-            if let id = args["id"] as? String {
+            if let eventName = args["name"] as? String {
                 for (index, handler) in self.streamHandlers.enumerated() {
-                    if handler.identifier == id {
+                    if handler.eventName == eventName {
                         self.streamHandlers.remove(at: index)
                         self.cancelStreamHandler(call, result: result)
                     }
@@ -150,21 +156,28 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         if let args = arguments as? Dictionary<String,Any> {
-            if let eventName = args["name"] as? String , let id = args["id"] as? String {
-                //// check ID duplication
-                for h in streamHandlers {
-                    if h.identifier == id {
-                        return FlutterError.init(code:    "Duplicate ID Error (awareframework_core/event)",
-                                                 message: "Error: Duplicate stream handle ID (\(eventName):\(id)). You can not set duplicate ID into the same sensor.",
-                                                 details: nil)
-                    }
-                }
-                let handler = StreamHandler.init(eventName, events, id)
+            if let eventName = args["name"] as? String {
+                //// check duplicate names and remove these
+                self.removeDuplicateEventNames(with: eventName)
+                let handler = StreamHandler.init(eventName, events)
                 streamHandlers.append(handler)
                 
             }
         }
         return nil;
+    }
+    
+    func removeDuplicateEventNames(with eventName:String){
+        for (index,handler) in streamHandlers.enumerated() {
+            if handler.eventName == eventName {
+                // print("[NOTE] \(eventName) is duplicate. The current event channel is overwritten by the new event channel.")
+                // remove the duplicate evnet name here
+                self.streamHandlers.remove(at: index)
+                // check the duplicate event name again
+                self.removeDuplicateEventNames(with: eventName)
+            }
+        }
+        return
     }
     
     @objc public func onCancel(withArguments arguments: Any?) -> FlutterError? {
@@ -173,27 +186,27 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
     }
     
     public func getStreamHandlers(name: String) -> [StreamHandler]? {
-        var handlers = Array<StreamHandler>()
+        if let hander = self.getStreamHandler(name: name){
+            return [hander]
+        }
+        return nil
+    }
+    
+    public func getStreamHandler(name: String) -> StreamHandler? {
         for handler in self.streamHandlers {
             if handler.eventName == name {
-                handlers.append(handler)
+                return handler
             }
         }
-        if handlers.count == 0{
-            return nil
-        }else{
-            return handlers
-        }
+        return nil
     }
 }
 
 public class StreamHandler{
     public let eventName:String
     public var eventSink:FlutterEventSink
-    public var identifier:String
-    init(_ eventName:String, _ eventSink:@escaping FlutterEventSink, _ identifier:String) {
+    init(_ eventName:String, _ eventSink:@escaping FlutterEventSink) {
         self.eventName = eventName
         self.eventSink = eventSink
-        self.identifier = identifier;
     }
 }

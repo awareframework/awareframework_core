@@ -7,19 +7,12 @@ import 'package:charts_flutter/flutter.dart' as charts;
 class AwareSensorCore {
 
   static const MethodChannel _coreChannel = const MethodChannel('awareframework_core/method');
-  // static const EventChannel  _coreStream  = const EventChannel('awareframework_core/event');
 
   /// method handling channel
   /// e.g.,
   ///   static const MethodChannel _channel
   ///           = const MethodChannel('awareframework_core/method');
   MethodChannel _channel;
-
-  /// event handling channel
-  /// e.g.,
-  ///   static const EventChannel  _coreStream
-  ///           = const EventChannel('awareframework_core/event');
-  // EventChannel  _stream;
 
   /// configuration of sensor
   /// e.g.,
@@ -38,12 +31,10 @@ class AwareSensorCore {
   AwareSensorCore(config):this.convenience(config);
   AwareSensorCore.convenience(this.config){
     this._channel = _coreChannel;
-    // this._stream  = _coreStream;
   }
 
   void setMethodChannel(MethodChannel channel){
     this._channel = channel;
-    // this._stream  = stream;
   }
 
   /// Start sensing
@@ -71,7 +62,7 @@ class AwareSensorCore {
   /// sync local-database with remote-database
   Future<Null> sync (bool force) async {
     try {
-      await _channel.invokeMethod('sync', force);
+      await _channel.invokeMethod('sync', {"force":bool} );
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -93,7 +84,7 @@ class AwareSensorCore {
     }
   }
 
-  Future<bool> isEnabled() async {
+  isEnabled() async {
     try {
       return await _channel.invokeMethod('is_enable', null);
     } on PlatformException catch (e) {
@@ -101,29 +92,34 @@ class AwareSensorCore {
     }
   }
 
-  Future<Null> cancelBroadcastStream(String identifier) async {
+  Future<Null> cancelBroadcastStream(String eventName) async {
     try {
-      return await _channel.invokeMethod("cancel_broadcast_stream", {"id":identifier});
+      return await _channel.invokeMethod("cancel_broadcast_stream", {"name":eventName});
     } on PlatformException catch (e) {
       print(e.message);
     }
   }
 
-  /// https://medium.com/flutter-io/flutter-platform-channels-ce7f540a104e
-  //    channel.receiveBroadcastStream().listen((dynamic event) {
-  //      // print('Received event: $event');
-  //    }, onError: (dynamic error) {
-  //      // print('Received error: ${error.message}');
-  //    });
-
-//  Stream<dynamic> receiveBroadcastStream(String eventName){
-//    return _stream.receiveBroadcastStream([eventName]);
-//  }
-
-  Stream<dynamic> getBroadcastStream(EventChannel eventChannel, String eventName, String identifier){
-    return eventChannel.receiveBroadcastStream({"name":eventName, "id":identifier});
+  // For subscribing an event channel (stream channel),
+  // (1) your have to prepare the channel instance by each channels.
+  //    static const EventChannel  _stream  = const EventChannel('awareframework_core/event');
+  // (2) after that, you have to set the channel by using the following method with a unique name
+  //    .getBroadcastStream(_stream, "UNIQUE_NAME")
+  Stream<dynamic> getBroadcastStream(EventChannel eventChannel, String eventName){
+    return eventChannel.receiveBroadcastStream({"name":eventName});
   }
 
+
+  void cancelAllEventChannels(){
+    // self.cancelBroadcastStream("on_data_changed");
+  }
+
+/// https://medium.com/flutter-io/flutter-platform-channels-ce7f540a104e
+//    channel.receiveBroadcastStream().listen((dynamic event) {
+//      // print('Received event: $event');
+//    }, onError: (dynamic error) {
+//      // print('Received error: ${error.message}');
+//    });
 
 }
 
@@ -257,19 +253,11 @@ class LineSeriesData {
   LineSeriesData(this.id, this.time, this.value);
 }
 
-class StreamLineSeriesChart extends StatelessWidget {
 
-  List<charts.Series> seriesList = List<charts.Series>();
-
+class StreamLineSeriesChart extends StatefulWidget {
   StreamLineSeriesChart(this.seriesList);
 
-  @override
-  Widget build(BuildContext context) {
-    return new charts.LineChart(
-        seriesList,
-        animate: false
-    );
-  }
+  final List<charts.Series> seriesList;
 
   static void add({Key key, @required double data,
     @required List<LineSeriesData> into,
@@ -335,4 +323,19 @@ class StreamLineSeriesChart extends StatelessWidget {
     }
     return data;
   }
+
+  @override
+  StreamLineSeriesChartState createState() => new StreamLineSeriesChartState();
+}
+
+class StreamLineSeriesChartState extends State<StreamLineSeriesChart> {
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.LineChart(
+        widget.seriesList,
+        animate: false
+    );
+  }
+
 }

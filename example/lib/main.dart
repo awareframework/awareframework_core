@@ -17,7 +17,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
 
   @override
   void initState() {
@@ -27,10 +26,19 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    widget.core.getBroadcastStream(_coreStream, "get_event", "abcd").listen((event){
+    
+    var sensor = AwareSensorCore.convenience(null);
+    sensor.start();
+    sensor.stop();
+    sensor.enable();
+    sensor.sync(true);
+    sensor.disable();
+    
+    widget.core.getBroadcastStream(_coreStream, "get_event").listen((event){
       print(event);
     });
-    widget.core.cancelBroadcastStream("abcd");
+    widget.core.cancelBroadcastStream("get_event");
+    
   }
 
   @override
