@@ -20,68 +20,53 @@ You can get more information about the package installation via the following [l
 
 3. Implement your sensor using the core-library
 ```dart
-/// install the library
-import 'package:awareframework_core/awareframework_core.dart';
-/// init sensor
-class SampleSensor extends AwareSensorCore {
-    static const MethodChannel _sampleMethod = const MethodChannel('awareframework_sample/method');
-    static const EventChannel  _sampleStream  = const EventChannel('awareframework_sample/event');
-    AccelerometerSensor(MethodChannel _sampleMethod, EventChannel _sampleStream) : super(_sampleMethod, _sampleStream);
-    
-      /// Init Accelerometer Sensor with AccelerometerSensorConfig
-      SampleSensor(AwareSensorConfig config):this.convenience(config);
-      SampleSensor.convenience(config) : super(config){
-        /// Set sensor method & event channels
-        super.setSensorChannels(_sampleMethod, _sampleStream);
-      }
-    
-      /// A sensor observer instance
-      Stream<Map<String,dynamic>> get onDataChanged {
-         return super.receiveBroadcastStream("on_data_changed")
-                     .map(
-                        (dynamic event) => Map.from(event)
-                     );
-      }
-    /// ...
-}
+/// The Accelerometer Sensor class
+class AccelerometerSensor extends AwareSensor {
 
-/// Make an AwareWidget
-class SampleCard extends StatefulWidget {
-  SampleCard({Key key, @required this.sensor}) : super(key: key);
+  /// Accelerometer Method Channel
+  static const MethodChannel _accelerometerMethod = const MethodChannel('awareframework_accelerometer/method');
 
-  SampleSensor sensor;
+  /// Accelerometer Event Channel
+  static const EventChannel  _accelerometerStream  = const EventChannel('awareframework_accelerometer/event');
 
-  @override
-  SampleCardState createState() => new SampleCardState();
-}
+  /// Init Accelerometer Sensor with AccelerometerSensorConfig
+  AccelerometerSensor(AccelerometerSensorConfig config):this.convenience(config);
+  AccelerometerSensor.convenience(config) : super(config){
+    super.setMethodChannel(_accelerometerMethod);
+  }
 
-class SampleCardState extends State<SampleCard> {
-  var data;
-  @override
-  void initState() {
-    super.initState();
-    if (widget.sensor == null) {
-      widget.sensor = new SampleSensor(SampleSensor._myMethod, SampleSensor._myStream);
-    }
-    widget.sensor.receiveBroadcastStream("on_data_changed").listen((event) {
-        setState((){
-          data = event;
-        });
-      }, onError: (dynamic error) {
-        // print('Received error: ${error.message}');
-      });
+  Stream<Map<String,dynamic>> get onDataChanged {
+     return super.getBroadcastStream( _accelerometerStream, "on_data_changed").map((dynamic event) => Map<String,dynamic>.from(event));
   }
 
   @override
-  Widget build(BuildContext context) {
-    final TextStyle _biggerFont = const TextStyle(fontSize: 18.0);
-    return new AwareCard(
-      contentWidget: Text(data),
-      title: "Sample",
-      sensor: widget.sensor
-    );
+  void cancelAllEventChannels() {
+    super.cancelBroadcastStream("on_data_changed");
+  }
+
+}
+
+///
+/// The Sensor Configuration Parameter class
+///
+class AccelerometerSensorConfig extends AwareSensorConfig {
+
+  int frequency    = 5;
+  double period    = 1.0;
+  double threshold = 0.0;
+
+  AccelerometerSensorConfig();
+
+  @override
+  Map<String, dynamic> toMap() {
+    var map = super.toMap();
+    map['frequency'] = frequency;
+    map['period']    = period;
+    map['threshold'] = threshold;
+    return map;
   }
 }
+
 ```
 
 ### Android
@@ -104,30 +89,54 @@ class SampleCardState extends State<SampleCard> {
 ```swift
 import Flutter
 import UIKit
-import com_aware_ios_sensor_core
+import com_awareframework_ios_sensor_accelerometer
+import com_awareframework_ios_sensor_core
+import awareframework_core
 
-public class SwiftAwareframeworkSamplePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler {
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        // add own channel
-        super.setChannels(with: registrar,
-                          instance:SwiftAwareframeworkSamplePlugin(),
-                          methodChannelName: "awareframework_sample/method",
-                          eventChannelName: "awareframework_sample/event")
+public class SwiftAwareframeworkAccelerometerPlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, AccelerometerObserver{
+        
+    var accelerometerSensor:AccelerometerSensor?
+    
+    public override init() {
+        super.init()
+        super.initializationCallEventHandler = self
     }
     
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
-        // init sensor
-        return AwareSensor();
+        if self.sensor == nil {
+            if let config = call.arguments as? Dictionary<String,Any>{
+                self.accelerometerSensor = AccelerometerSensor.init(AccelerometerSensor.Config(config))
+            }else{
+                self.accelerometerSensor = AccelerometerSensor.init(AccelerometerSensor.Config())
+            }
+            self.accelerometerSensor?.CONFIG.sensorObserver = self
+            return self.accelerometerSensor
+        }else{
+            return nil
+        }
     }
     
-    //    func opnSomeChanged(){
-    //        for handler in sController.streamHandlers {
-    //            if handler.eventName == "eventName" {
-    //                handler.eventSink(nil)
-    //            }
-    //        }
-    //    }
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let instance = SwiftAwareframeworkAccelerometerPlugin()
+        // add own channel
+        super.setMethodChannel(with: registrar,
+                               instance: instance,
+                               channelName: "awareframework_accelerometer/method");
+        super.setEventChannels(with: registrar,
+                               instance: instance,
+                               channelNames: ["awareframework_accelerometer/event"]);
+
+    }
+    
+    public func onDataChanged(data: AccelerometerData) {
+        for handler in self.streamHandlers {
+            if handler.eventName == "on_data_changed" {
+                handler.eventSink(data.toDictionary())
+            }
+        }
+    }
 }
+
 ```
 
 ### Eaxample App

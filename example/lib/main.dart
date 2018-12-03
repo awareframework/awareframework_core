@@ -27,11 +27,11 @@ class _MyAppState extends State<MyApp> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     
-    var sensor = AwareSensorCore.convenience(null);
+    var sensor = AwareSensorCore(null);
     sensor.start();
     sensor.stop();
     sensor.enable();
-    sensor.sync(true);
+    sensor.sync(force: true);
     sensor.disable();
     
     widget.core.getBroadcastStream(_coreStream, "get_event").listen((event){
