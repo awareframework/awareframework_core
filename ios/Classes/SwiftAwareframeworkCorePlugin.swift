@@ -90,6 +90,8 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
             self.isEnable(call, result: result)
         }else if call.method == "cancel_broadcast_stream" {
             self.cancelStreamHandler(call, result:result)
+        }else if call.method == "set_label"{
+            self.setLabel(call, result: result)
         }
         
         if let methodHandler = self.methodEventHandler{
@@ -138,6 +140,17 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
             result(uwSensor.isEnabled());
         }
     }
+    
+    public func setLabel(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if let uwSensor = self.sensor {
+            if let args = call.arguments as? Dictionary<String, Any> {
+                if let label = args["label"] as? String {
+                    uwSensor.set(label: label)
+                }
+            }
+        }
+    }
+    
     
     public func cancelStreamHandler(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let args = call.arguments as? Dictionary<String,Any> {

@@ -14,7 +14,8 @@ abstract class ISensorController{
   Future<Null> sync ({bool force=false});
   Future<Null> enable ();
   Future<Null> disable ();
-  Future<bool> isEnabled();
+  Future<Null> setLabel(String label);
+  Future<dynamic> isEnabled();
 }
 
 /// The foundation class of Aware-Sensor
@@ -134,7 +135,7 @@ class AwareSensor extends ISensorController {
   /// Disable this sensor
   /// NOTE: You need to set a method channel before using this method.
   Future<Null> disable () async {
-    if (_channel == null){
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
@@ -147,13 +148,27 @@ class AwareSensor extends ISensorController {
 
   /// Get the status of this sensor (enabled or not)
   /// NOTE: You need to set a method channel before using this method.
-  Future<bool> isEnabled() async {
+  Future<dynamic> isEnabled() async {
     if (_channel == null){
       print("Please set a method channel before use the start method.");
       return null;
     }
     try {
       return await _channel.invokeMethod('is_enable', null);
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
+  /// Get the status of this sensor (enabled or not)
+  /// NOTE: You need to set a method channel before using this method.
+  Future<Null> setLabel(String label) async {
+    if (_channel == null){
+      print("Please set a method channel before use the start method.");
+      return null;
+    }
+    try {
+      return await _channel.invokeMethod('set_label', {"labeel":label});
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -224,9 +239,7 @@ class AwareSensorConfig {
   /// The database encryption key (default = `null`)
   String dbEncryptionKey;
   /// The database type on Android (default = DatabaseTypeAndroid.ROOM)
-  DatabaseTypeAndroid dbTypeAndroid = DatabaseTypeAndroid.ROOM;
-  /// The database type on iOS (default = DatabaseTypeIOS.Realm)
-  DatabaseTypeIOS     dbTypeIOS     = DatabaseTypeIOS.REALM;
+  DatabaseType dbType = DatabaseType.DEFAULT;
   /// The local database path (default = "aware")
   String dbPath = "aware";
   /// The remote database host name (default = `null`)
@@ -238,8 +251,7 @@ class AwareSensorConfig {
     this.label,
     this.deviceId,
     this.dbEncryptionKey,
-    this.dbTypeAndroid,
-    this.dbTypeIOS,
+    this.dbType,
     this.dbPath,
     this.dbHost
   });
@@ -248,11 +260,10 @@ class AwareSensorConfig {
   /// MethodChannel. Sending the configuration object through the MethodChannel,
   /// we have to use a Map object.
   ///
-  /// The database type is selectable on both iOS and Android platform. By the
-  /// default, iOS is Realm and Android is Room database. If you don't want to
-  /// save the data into database, please set NONE on both platforms (dbTypeIOS
-  /// and dbTypeAndroid). The list of supported databases is listed on
-  /// DatabaseTypeIOS and DatabaseTypeAndroid.
+  /// If you need to save the data into database, please set
+  /// DatabaseType.DEFAULT to dbType. In the setting, iOS uses Realm,
+  /// and Android uses Room database internally. In addition, If you do NOT
+  /// want to save data into database, please set NONE as a dbType.
   ///
   /// When you call -toMap(), the method converts the dbType element depends on the
   /// current platform.
@@ -274,15 +285,9 @@ class AwareSensorConfig {
 
     // change dbType setting depends on the platform (iOS or Android)
     if(Platform.isIOS){
-      if(this.dbTypeIOS == DatabaseTypeIOS.NONE){
+      if(this.dbType == DatabaseType.NONE){
         config["dbType"] = 0;
-      }else if (this.dbTypeIOS == DatabaseTypeIOS.REALM){
-        config["dbType"] = 1;
-      }
-    }else if(Platform.isAndroid){
-      if(this.dbTypeAndroid == DatabaseTypeAndroid.NONE){
-        config["dbType"] = 0;
-      }else if (this.dbTypeAndroid == DatabaseTypeAndroid.ROOM){
+      }else if (this.dbType == DatabaseType.DEFAULT){
         config["dbType"] = 1;
       }
     }
@@ -296,19 +301,11 @@ class AwareSensorConfig {
 ///
 /// NONE:  No database
 /// REALM: Realm database [Realm](https://realm.io)
-enum DatabaseTypeIOS{
+enum DatabaseType{
   NONE,
-  REALM,
+  DEFAULT,
 }
 
-/// The list of supported database types on Android
-///
-/// NONE:  No database
-/// REALM: Room database [Room](https://developer.android.com/topic/libraries/architecture/room)
-enum DatabaseTypeAndroid{
-  NONE,
-  ROOM,
-}
 
 
 class AwareDbSyncManagerConfig {
