@@ -160,7 +160,7 @@ class AwareSensor extends ISensorController {
     }
   }
 
-  /// Get the status of this sensor (enabled or not)
+  /// Set a label to stored data
   /// NOTE: You need to set a method channel before using this method.
   Future<Null> setLabel(String label) async {
     if (_channel == null){
@@ -201,12 +201,6 @@ class AwareSensor extends ISensorController {
     } on PlatformException catch (e) {
       print(e.message);
     }
-  }
-
-  /// Cancel all event channels on this method
-  /// NOTE: If your sensor used the
-  void cancelAllEventChannels(){
-    // self.cancelBroadcastStream("on_data_changed");
   }
 }
 
@@ -296,7 +290,6 @@ class AwareSensorConfig {
   }
 }
 
-
 /// The list of supported database types on iOS
 ///
 /// NONE:  No database
@@ -305,8 +298,6 @@ enum DatabaseType{
   NONE,
   DEFAULT,
 }
-
-
 
 class AwareDbSyncManagerConfig {
   double syncInterval      = 1.0;
@@ -327,6 +318,29 @@ class AwareDbSyncManagerConfig {
   }
 
 }
+
+class AwareData {
+  int timestamp   = 0;
+  String deviceId = "";
+  String label    = "";
+  int timezone    = 0;
+  String os       = "";
+  int jsonVersion = 0;
+
+  AwareData():this.from(null);
+  AwareData.from(Map<String,dynamic> data) {
+    if (data != null){
+      deviceId    = data["deviceId"] ?? "";
+      timestamp   = data["timestamp"] ?? 0;
+      label       = data["label"] ?? "";
+      timezone    = data["timezone"] ?? 0;
+      os          = data["os"] ?? "";
+      jsonVersion = data["jsonVersion"] ?? 0;
+    }
+  }
+}
+
+
 
 /// AWARE Core Sensor class
 class AwareSensorCore extends AwareSensor {
