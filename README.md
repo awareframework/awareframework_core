@@ -1,5 +1,7 @@
 # awareframework_core
 
+[![Build Status](https://travis-ci.com/awareframework/awareframework_core.svg?branch=master)](https://travis-ci.com/awareframework/awareframework_core)
+
 A new flutter plugin project.
 
 ## Developing Aware Plugin for Flutter

@@ -1,21 +1,16 @@
 #matrix:
 #  include:
 os: osx
-language: objective-c
+language: generic
 osx_image: xcode10.1
 before_script:
-- pip install six
-- brew update
-- brew install --HEAD libimobiledevice
-- brew install ideviceinstaller
-- brew install ios-deploy
-- git clone https://github.com/flutter/flutter.git -b alpha --depth 1
+- git clone https://github.com/flutter/flutter.git -b beta
 script:
 - ./flutter/bin/flutter packages get
 - ./flutter/bin/flutter analyze
-- (cd example && ./flutter/bin/flutter packages get)
-- (cd example && ./flutter/bin/flutter analyze)
-- (cd example && ./flutter/bin/flutter test)
+- (cd example && ../flutter/bin/flutter packages get)
+- (cd example && ../flutter/bin/flutter analyze)
+- (cd example && ../flutter/bin/flutter test)
 
 cache:
   directories:
