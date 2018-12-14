@@ -240,13 +240,13 @@ class AwareSensorConfig {
   String dbHost;
 
   AwareSensorConfig({
-    this.debug,
-    this.enabled,
-    this.label,
-    this.deviceId,
+    this.debug = false,
+    this.enabled = false,
+    this.label = "",
+    this.deviceId = "",
     this.dbEncryptionKey,
-    this.dbType,
-    this.dbPath,
+    this.dbType = DatabaseType.DEFAULT,
+    this.dbPath = "aware",
     this.dbHost
   });
 
@@ -300,6 +300,7 @@ enum DatabaseType{
 }
 
 class AwareDbSyncManagerConfig {
+
   double syncInterval      = 1.0;
   bool wifiOnly            = true;
   bool batteryChargingOnly = false;
@@ -320,6 +321,9 @@ class AwareDbSyncManagerConfig {
 }
 
 class AwareData {
+
+  Map<String,dynamic> source;
+
   int timestamp   = 0;
   String deviceId = "";
   String label    = "";
@@ -336,7 +340,16 @@ class AwareData {
       timezone    = data["timezone"] ?? 0;
       os          = data["os"] ?? "";
       jsonVersion = data["jsonVersion"] ?? 0;
+      source = data;
     }
+  }
+
+  @override
+  String toString() {
+    if(source != null){
+      return source.toString();
+    }
+    return super.toString();
   }
 }
 
