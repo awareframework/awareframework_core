@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/awareframework/awareframework_core.svg?branch=master)](https://travis-ci.com/awareframework/awareframework_core)
 
-A new flutter plugin project.
+A Core Plugin for Aware Framework on Flutter
 
 ## Developing Aware Plugin for Flutter
 
@@ -10,7 +10,7 @@ A new flutter plugin project.
 
 1. Make a template app using flutter command
 ```console
-$ flutter create --org com.awareframework.sample --template=plugin -i swift -a kotlin awareframework_sample
+$ flutter create --org com.awareframework.accelerometer --template=plugin -i swift -a kotlin awareframework_accelerometer
 ```
 
 2. Add the awareframework_core into your pubspec.yaml
@@ -32,8 +32,8 @@ class AccelerometerSensor extends AwareSensor {
   static const EventChannel  _accelerometerStream  = const EventChannel('awareframework_accelerometer/event');
 
   /// Init Accelerometer Sensor with AccelerometerSensorConfig
-  AccelerometerSensor(AccelerometerSensorConfig config):this.convenience(config);
-  AccelerometerSensor.convenience(config) : super(config){
+  AccelerometerSensor():this.init(null);
+  AccelerometerSensor.init(AccelerometerSensorConfig config) : super.init(config){
     super.setMethodChannel(_accelerometerMethod);
   }
 
@@ -78,7 +78,7 @@ class AccelerometerSensorConfig extends AwareSensorConfig {
 
 ### iOS
 
-1. Add following code into ios/awareframework_sample.podspec
+1. Add following code into ios/awareframework_accelerometer.podspec
 ```console
   # update author information and url
   s.dependency 'awareframework_core'
