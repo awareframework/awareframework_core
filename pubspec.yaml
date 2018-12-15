@@ -1,5 +1,5 @@
 name: awareframework_core
-description: awareframework_core provides core classes for developing your own sensor module on aware framework.
+description: The core classes of sensor modules on Aware Framework
 version: 0.1.1
 author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiyama@oulu.fi>
 homepage: http://www.awareframework.com

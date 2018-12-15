@@ -228,8 +228,8 @@ class AwareSensorConfig {
   bool debug      = false;
   /// The label for the sensor data (default = "")
   String label    = "";
-  /// The deviceId of the sensor (default = "")
-  String deviceId = "";
+  /// The deviceId of the sensor (default = `null`).
+  String deviceId ;
   /// The database encryption key (default = `null`)
   String dbEncryptionKey;
   /// The database type on Android (default = DatabaseTypeAndroid.ROOM)
@@ -243,7 +243,7 @@ class AwareSensorConfig {
     this.debug = false,
     this.enabled = false,
     this.label = "",
-    this.deviceId = "",
+    this.deviceId,
     this.dbEncryptionKey,
     this.dbType = DatabaseType.DEFAULT,
     this.dbPath = "aware",

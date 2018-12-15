@@ -1,4 +1,4 @@
-# awareframework_core
+# Aware Core
 
 [![Build Status](https://travis-ci.com/awareframework/awareframework_core.svg?branch=master)](https://travis-ci.com/awareframework/awareframework_core)
 

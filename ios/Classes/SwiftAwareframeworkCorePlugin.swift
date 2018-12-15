@@ -99,19 +99,19 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         }
     }
     
-    public func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func start(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             uwSensor.start();
         }
     }
     
-    public func stop(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func stop(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             uwSensor.stop();
         }
     }
     
-    public func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func sync(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             if let args = call.arguments as? Dictionary<String, Any> {
                 if let force = args["force"] as? Bool {
@@ -123,25 +123,25 @@ open class AwareFlutterPluginCore: NSObject, FlutterStreamHandler {
         }
     }
     
-    public func enable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func enable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             uwSensor.enable();
         }
     }
     
-    public func disable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func disable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             uwSensor.disable();
         }
     }
     
-    public func isEnable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func isEnable(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             result(uwSensor.isEnabled());
         }
     }
     
-    public func setLabel(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    open func setLabel(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if let uwSensor = self.sensor {
             if let args = call.arguments as? Dictionary<String, Any> {
                 if let label = args["label"] as? String {
