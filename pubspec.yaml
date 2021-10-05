@@ -1,16 +1,28 @@
 name: awareframework_core
 description: The core classes of sensor modules on Aware Framework
-version: 0.1.1
-author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiyama@oulu.fi>
+version: 0.2.0
+
 homepage: http://www.awareframework.com
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:
     sdk: flutter
   charts_flutter: ^0.8.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.awareframework.core.awareframeworkcore
+        pluginClass: AwareframeworkCorePlugin
+      ios:
+        pluginClass: AwareframeworkCorePlugin
+
+
 
 dev_dependencies:
   flutter_test:
@@ -21,10 +33,10 @@ dev_dependencies:
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
-flutter:
-  plugin:
-    androidPackage: com.awareframework.core.awareframeworkcore
-    pluginClass: AwareframeworkCorePlugin
+# flutter:
+#   plugin:
+#     androidPackage: com.awareframework.core.awareframeworkcore
+#     pluginClass: AwareframeworkCorePlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
