@@ -17,7 +17,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.awareframework.core.awareframeworkcore
+        package: com.awareframework.core.awareframework_core
         pluginClass: AwareframeworkCorePlugin
       ios:
         pluginClass: AwareframeworkCorePlugin

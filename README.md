@@ -10,7 +10,7 @@ A Core Plugin for Aware Framework on Flutter
 
 1. Make a template app using flutter command
 ```console
-$ flutter create --org com.awareframework.accelerometer --template=plugin -i swift -a kotlin awareframework_accelerometer
+$ flutter create --org com.awareframework.accelerometer --template=plugin --platforms=android,ios -i swift -a kotlin awareframework_accelerometer
 ```
 
 2. Add the awareframework_core into your pubspec.yaml
@@ -179,7 +179,7 @@ class _MyAppState extends State<MyApp> {
 ## Publishing the your plugin
 ### Add author and homepage information into pubspec.yaml
 ```yaml
-author: AWARE Mobile Context Instrumentation Middleware/Framework <yuuki.nishiyama@oulu.fi>
+author: AWARE Mobile Context Instrumentation Middleware/Framework <yuukin@iis.u-tokyo.ac.jp>
 homepage: http://www.awareframework.com
 ```
 
