@@ -5,15 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-
 /// ISensorController expresses the interfaces of AwareSensor. The methods in
 /// the abstract class are connected to the backend iOS and Android code.
-abstract class ISensorController{
+abstract class ISensorController {
   Future<Null> start();
   Future<Null> stop();
-  Future<Null> sync ({bool force=false});
-  Future<Null> enable ();
-  Future<Null> disable ();
+  Future<Null> sync({bool force = false});
+  Future<Null> enable();
+  Future<Null> disable();
   Future<Null> setLabel(String label);
   Future<dynamic> isEnabled();
 }
@@ -37,7 +36,6 @@ abstract class ISensorController{
 ///  -cancelBroadcastStream() for all subscribed event.
 ///
 class AwareSensor extends ISensorController {
-
   ///
   /// The _channel (MethodChannel) is a gateway for calling AWARE sensor
   /// methods on iOS and Android. You need to set a unique MethodChannel
@@ -65,7 +63,7 @@ class AwareSensor extends ISensorController {
   /// AwareSensorConfiguration instance. If the configuration parameter is null,
   /// the initializer uses the default setting.
   ///
-  AwareSensor(this.config){
+  AwareSensor(this.config) {
     if (this.config == null) {
       this.config = AwareSensorConfig();
     }
@@ -74,14 +72,14 @@ class AwareSensor extends ISensorController {
   /// Start this sensor
   /// NOTE: You need to set a method channel before using this method.
   Future<Null> start() async {
-    if (_channel == null){
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
     try {
-      if (config == null){
+      if (config == null) {
         await _channel.invokeMethod('start', null);
-      }else{
+      } else {
         await _channel.invokeMethod('start', config.toMap());
       }
     } on PlatformException catch (e) {
@@ -91,8 +89,8 @@ class AwareSensor extends ISensorController {
 
   /// Stop this sensor
   /// NOTE: You need to set a method channel before using this method.
-  Future<Null> stop () async {
-    if (_channel == null){
+  Future<Null> stop() async {
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
@@ -106,13 +104,13 @@ class AwareSensor extends ISensorController {
   /// Sync the local-database on this phone with a remote-database
   /// You can sync the database forcefully by using `force=true` option.
   /// NOTE: You need to set a method channel before using this method.
-  Future<Null> sync ({bool force=false}) async {
-    if (_channel == null){
+  Future<Null> sync({bool force = false}) async {
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
     try {
-      await _channel.invokeMethod('sync', {"force":force} );
+      await _channel.invokeMethod('sync', {"force": force});
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -120,8 +118,8 @@ class AwareSensor extends ISensorController {
 
   /// Enable this sensor
   /// NOTE: You need to set a method channel before using this method.
-  Future<Null> enable () async {
-    if (_channel == null){
+  Future<Null> enable() async {
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
@@ -134,7 +132,7 @@ class AwareSensor extends ISensorController {
 
   /// Disable this sensor
   /// NOTE: You need to set a method channel before using this method.
-  Future<Null> disable () async {
+  Future<Null> disable() async {
     if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
@@ -149,7 +147,7 @@ class AwareSensor extends ISensorController {
   /// Get the status of this sensor (enabled or not)
   /// NOTE: You need to set a method channel before using this method.
   Future<dynamic> isEnabled() async {
-    if (_channel == null){
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
@@ -163,12 +161,12 @@ class AwareSensor extends ISensorController {
   /// Set a label to stored data
   /// NOTE: You need to set a method channel before using this method.
   Future<Null> setLabel(String label) async {
-    if (_channel == null){
+    if (_channel == null) {
       print("Please set a method channel before use the start method.");
       return null;
     }
     try {
-      return await _channel.invokeMethod('set_label', {"labeel":label});
+      return await _channel.invokeMethod('set_label', {"labeel": label});
     } on PlatformException catch (e) {
       print(e.message);
     }
@@ -180,7 +178,7 @@ class AwareSensor extends ISensorController {
   ///
   ///   static const MethodChannel _coreChannel
   ///                     = const MethodChannel('awareframework_core/method');
-  void setMethodChannel(MethodChannel channel){
+  void setMethodChannel(MethodChannel channel) {
     this._channel = channel;
   }
 
@@ -189,21 +187,22 @@ class AwareSensor extends ISensorController {
   ///    static const EventChannel  _stream  = const EventChannel('awareframework_core/event');
   /// (2) after that, you have to set the channel by using the following method with a unique name
   ///    .getBroadcastStream(_stream, "UNIQUE_NAME")
-  Stream<dynamic> getBroadcastStream(EventChannel eventChannel, String eventName){
-    return eventChannel.receiveBroadcastStream({"name":eventName});
+  Stream<dynamic> getBroadcastStream(
+      EventChannel eventChannel, String eventName) {
+    return eventChannel.receiveBroadcastStream({"name": eventName});
   }
 
   /// Cancel a broadcast stream (= event channel)
   /// NOTE: You need to set a method channel before using this method.
   Future<Null> cancelBroadcastStream(String eventName) async {
     try {
-      return await _channel.invokeMethod("cancel_broadcast_stream", {"name":eventName});
+      return await _channel
+          .invokeMethod("cancel_broadcast_stream", {"name": eventName});
     } on PlatformException catch (e) {
       print(e.message);
     }
   }
 }
-
 
 ///
 /// A default sensor configuration
@@ -223,32 +222,38 @@ class AwareSensor extends ISensorController {
 ///
 class AwareSensorConfig {
   /// The status of sensor enabled of not (default = false)
-  bool enabled    = false;
+  bool enabled = false;
+
   /// The status of debug mode (default = false)
-  bool debug      = false;
+  bool debug = false;
+
   /// The label for the sensor data (default = "")
-  String label    = "";
+  String label = "";
+
   /// The deviceId of the sensor (default = `null`).
-  String deviceId ;
+  String deviceId;
+
   /// The database encryption key (default = `null`)
   String dbEncryptionKey;
+
   /// The database type on Android (default = DatabaseTypeAndroid.ROOM)
   DatabaseType dbType = DatabaseType.DEFAULT;
+
   /// The local database path (default = "aware")
   String dbPath = "aware";
+
   /// The remote database host name (default = `null`)
   String dbHost;
 
-  AwareSensorConfig({
-    this.debug = false,
-    this.enabled = false,
-    this.label = "",
-    this.deviceId,
-    this.dbEncryptionKey,
-    this.dbType = DatabaseType.DEFAULT,
-    this.dbPath = "aware",
-    this.dbHost
-  });
+  AwareSensorConfig(
+      {this.debug = false,
+      this.enabled = false,
+      this.label = "",
+      this.deviceId,
+      this.dbEncryptionKey,
+      this.dbType = DatabaseType.DEFAULT,
+      this.dbPath = "aware",
+      this.dbHost});
 
   /// Generate a Map<String,dynamic> object for sensing the configuration via
   /// MethodChannel. Sending the configuration object through the MethodChannel,
@@ -261,27 +266,28 @@ class AwareSensorConfig {
   ///
   /// When you call -toMap(), the method converts the dbType element depends on the
   /// current platform.
-  Map<String,dynamic> toMap() {
-    var config =
-      {"enabled":enabled,
-        "debug":debug,
-        "label":label,
-        "deviceId":deviceId,
-        "dbPath":dbPath};
+  Map<String, dynamic> toMap() {
+    var config = {
+      "enabled": enabled,
+      "debug": debug,
+      "label": label,
+      "deviceId": deviceId,
+      "dbPath": dbPath
+    };
 
-    if(dbEncryptionKey != null){
+    if (dbEncryptionKey != null) {
       config["dbEncryptionKey"] = dbEncryptionKey;
     }
 
-    if (dbHost != null){
+    if (dbHost != null) {
       config["dbHost"] = dbHost;
     }
 
     // change dbType setting depends on the platform (iOS or Android)
-    if(Platform.isIOS){
-      if(this.dbType == DatabaseType.NONE){
+    if (Platform.isIOS) {
+      if (this.dbType == DatabaseType.NONE) {
         config["dbType"] = 0;
-      }else if (this.dbType == DatabaseType.DEFAULT){
+      } else if (this.dbType == DatabaseType.DEFAULT) {
         config["dbType"] = 1;
       }
     }
@@ -294,51 +300,48 @@ class AwareSensorConfig {
 ///
 /// NONE:  No database
 /// REALM: Realm database [Realm](https://realm.io)
-enum DatabaseType{
+enum DatabaseType {
   NONE,
   DEFAULT,
 }
 
 class AwareDbSyncManagerConfig {
-
-  double syncInterval      = 1.0;
-  bool wifiOnly            = true;
+  double syncInterval = 1.0;
+  bool wifiOnly = true;
   bool batteryChargingOnly = false;
-  bool debug               = false;
-  List<String> sensors     = List<String>();
+  bool debug = false;
+  List<String> sensors = List<String>();
 
-  Map<String,dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     var config = {
-      "syncInterval" : syncInterval,
-      "wifiOnly" : wifiOnly,
-      "batteryChargingOnly" : batteryChargingOnly,
-      "debug"    : debug,
-      "sensors"  : sensors
+      "syncInterval": syncInterval,
+      "wifiOnly": wifiOnly,
+      "batteryChargingOnly": batteryChargingOnly,
+      "debug": debug,
+      "sensors": sensors
     };
     return config;
   }
-
 }
 
 class AwareData {
+  Map<String, dynamic> source;
 
-  Map<String,dynamic> source;
-
-  int timestamp   = 0;
+  int timestamp = 0;
   String deviceId = "";
-  String label    = "";
-  int timezone    = 0;
-  String os       = "";
+  String label = "";
+  int timezone = 0;
+  String os = "";
   int jsonVersion = 0;
 
-  AwareData():this.from(null);
-  AwareData.from(Map<String,dynamic> data) {
-    if (data != null){
-      deviceId    = data["deviceId"] ?? "";
-      timestamp   = data["timestamp"] ?? 0;
-      label       = data["label"] ?? "";
-      timezone    = data["timezone"] ?? 0;
-      os          = data["os"] ?? "";
+  AwareData() : this.from(null);
+  AwareData.from(Map<String, dynamic> data) {
+    if (data != null) {
+      deviceId = data["deviceId"] ?? "";
+      timestamp = data["timestamp"] ?? 0;
+      label = data["label"] ?? "";
+      timezone = data["timezone"] ?? 0;
+      os = data["os"] ?? "";
       jsonVersion = data["jsonVersion"] ?? 0;
       source = data;
     }
@@ -346,22 +349,21 @@ class AwareData {
 
   @override
   String toString() {
-    if(source != null){
+    if (source != null) {
       return source.toString();
     }
     return super.toString();
   }
 }
 
-
-
 /// AWARE Core Sensor class
 class AwareSensorCore extends AwareSensor {
-  static const MethodChannel _coreChannel = const MethodChannel('awareframework_core/method');
+  static const MethodChannel _coreChannel =
+      const MethodChannel('awareframework_core/method');
 
   AwareSensorConfig config;
 
-  AwareSensorCore(config) : super(config){
+  AwareSensorCore(config) : super(config) {
     this._channel = _coreChannel;
   }
 
@@ -373,7 +375,8 @@ class AwareSensorCore extends AwareSensor {
 /// The foundation class of AWARE Card.
 ///
 class AwareCard extends StatefulWidget {
-  AwareCard({Key key, this.contentWidget, this.title, this.sensor}) : super(key: key);
+  AwareCard({Key key, this.contentWidget, this.title, this.sensor})
+      : super(key: key);
   final Widget contentWidget;
   final AwareSensor sensor;
   final String title;
@@ -383,50 +386,48 @@ class AwareCard extends StatefulWidget {
 }
 
 class AwareCardState extends State<AwareCard> {
-
   @override
   void initState() {
     super.initState();
   }
 
-  Widget getContentWidget(){
-    if(widget.contentWidget == null) {
+  Widget getContentWidget() {
+    if (widget.contentWidget == null) {
       return new Icon(Icons.show_chart, size: 150.0);
-    }else{
+    } else {
       return widget.contentWidget;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle _biggerFont = new TextStyle(color: Color.fromARGB(255, 117, 117, 117),
+    final TextStyle _biggerFont = new TextStyle(
+        color: Color.fromARGB(255, 117, 117, 117),
         fontSize: 24.0,
         fontWeight: FontWeight.bold);
 
     return new Padding(
-        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, left: 12.0, right: 12.0),
+        padding: const EdgeInsets.only(
+            top: 16.0, bottom: 16.0, left: 12.0, right: 12.0),
         child: new Card(
             child: new Row(
+          children: <Widget>[
+            new Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: new Text("${widget.title}", style:_biggerFont),
-                    ),
-                    getContentWidget(),
-                    new Divider()
-                  ],
+                Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: new Text("${widget.title}", style: _biggerFont),
                 ),
+                getContentWidget(),
+                new Divider()
               ],
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-            )
-        )
-    );
+            ),
+          ],
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+        )));
   }
-
 }
 
 class LineSeriesData {
@@ -441,14 +442,16 @@ class StreamLineSeriesChart extends StatefulWidget {
 
   final List<charts.Series> seriesList;
 
-  static void add({Key key, @required double data,
-    @required List<LineSeriesData> into,
-    @required String id,
-    @required int buffer}){
+  static void add(
+      {Key key,
+      double data,
+      List<LineSeriesData> into,
+      String id,
+      int buffer}) {
     into.add(new LineSeriesData(id, into.length + 1, data));
 
     if (into.length > buffer) {
-      for (int i = 0; i < buffer; i++){
+      for (int i = 0; i < buffer; i++) {
         into[i].time = into[i].time - 1;
       }
       into.removeAt(0);
@@ -456,13 +459,14 @@ class StreamLineSeriesChart extends StatefulWidget {
   }
 
   /// Create one series with sample hard coded data.
-  static List<charts.Series<LineSeriesData, int>> createTimeSeriesData(List<LineSeriesData> x,
-      List<LineSeriesData> y,
-      List<LineSeriesData> z,) {
-
+  static List<charts.Series<LineSeriesData, int>> createTimeSeriesData(
+    List<LineSeriesData> x,
+    List<LineSeriesData> y,
+    List<LineSeriesData> z,
+  ) {
     var data = List<charts.Series<LineSeriesData, int>>();
 
-    if (x.length == 0 && y.length==0 && z.length == 0 ){
+    if (x.length == 0 && y.length == 0 && z.length == 0) {
       data.add(new charts.Series<LineSeriesData, int>(
         id: "line",
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
@@ -473,7 +477,7 @@ class StreamLineSeriesChart extends StatefulWidget {
       return data;
     }
 
-    if (x.length > 0){
+    if (x.length > 0) {
       var id = x[0].id;
       data.add(new charts.Series<LineSeriesData, int>(
         id: id,
@@ -483,7 +487,7 @@ class StreamLineSeriesChart extends StatefulWidget {
         data: x,
       ));
     }
-    if (y.length > 0){
+    if (y.length > 0) {
       var id = x[0].id;
       data.add(new charts.Series<LineSeriesData, int>(
         id: id,
@@ -493,7 +497,7 @@ class StreamLineSeriesChart extends StatefulWidget {
         data: y,
       ));
     }
-    if (z.length > 0){
+    if (z.length > 0) {
       var id = x[0].id;
       data.add(new charts.Series<LineSeriesData, int>(
         id: id,
@@ -511,13 +515,8 @@ class StreamLineSeriesChart extends StatefulWidget {
 }
 
 class StreamLineSeriesChartState extends State<StreamLineSeriesChart> {
-
   @override
   Widget build(BuildContext context) {
-    return new charts.LineChart(
-        widget.seriesList,
-        animate: false
-    );
+    return new charts.LineChart(widget.seriesList, animate: false);
   }
-
 }
