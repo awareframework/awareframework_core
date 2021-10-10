@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+
 import com_awareframework_ios_sensor_core
 
 /// A protocol for handling a sensor initialization call
