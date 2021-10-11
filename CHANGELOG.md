@@ -1,3 +1,6 @@
+## 0.3.1
+* Fix a minor issue
+
 ## 0.3.0
 * Integrated AWARE Android-library (com.awareframework.android.core)
 
