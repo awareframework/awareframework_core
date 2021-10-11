@@ -1,3 +1,6 @@
+## 0.5.0
+* Fix a minor issue
+
 ## 0.3.1
 * Fix a minor issue
 
