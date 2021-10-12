@@ -1,3 +1,6 @@
+## 0.6.0
+* Fix a config parameter issue
+
 ## 0.5.0
 * Fix a minor issue
 

@@ -1,11 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-
-// import 'aware_sensor_config.dart';
 
 class AwareframeworkCore {
   static const MethodChannel _channel =
@@ -223,7 +218,7 @@ class AwareSensorCore extends AwareSensor {
 
   AwareSensorConfig? config;
 
-  AwareSensorCore(config) : super(config) {
+  AwareSensorCore(this.config) : super(config) {
     this._channel = _coreChannel;
   }
 
@@ -373,163 +368,6 @@ class AwareData {
 
   @override
   String toString() {
-    if (source != null) {
-      return source.toString();
-    }
-    return super.toString();
-  }
-}
-
-///
-/// The foundation class of AWARE Card.
-///
-class AwareCard extends StatefulWidget {
-  Widget? contentWidget;
-  final AwareSensor sensor;
-  final String title;
-
-  AwareCard(
-      {Key? key, this.contentWidget, required this.title, required this.sensor})
-      : super(key: key);
-
-  @override
-  AwareCardState createState() => new AwareCardState();
-}
-
-class AwareCardState extends State<AwareCard> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget getContentWidget() {
-    if (widget.contentWidget == null) {
-      return new Icon(Icons.show_chart, size: 150.0);
-    } else {
-      return widget.contentWidget!;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle _biggerFont = new TextStyle(
-        color: Color.fromARGB(255, 117, 117, 117),
-        fontSize: 24.0,
-        fontWeight: FontWeight.bold);
-
-    return new Padding(
-      padding: const EdgeInsets.only(
-          top: 16.0, bottom: 16.0, left: 12.0, right: 12.0),
-      child: Card(
-        child: Row(
-          children: <Widget>[
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: new Text("${widget.title}", style: _biggerFont),
-                ),
-                getContentWidget(),
-                Divider()
-              ],
-            ),
-          ],
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
-      ),
-    );
-  }
-}
-
-class LineSeriesData {
-  String id;
-  int time;
-  double value;
-  LineSeriesData(this.id, this.time, this.value);
-}
-
-class StreamLineSeriesChart extends StatefulWidget {
-  StreamLineSeriesChart(seriesList);
-
-  final List<charts.Series<dynamic, num>> seriesList = [];
-
-  static void add(
-      {required Key key,
-      required double data,
-      required List<LineSeriesData> into,
-      required String id,
-      int buffer = 0}) {
-    into.add(new LineSeriesData(id, into.length + 1, data));
-
-    if (into.length > buffer) {
-      for (int i = 0; i < buffer; i++) {
-        into[i].time = into[i].time - 1;
-      }
-      into.removeAt(0);
-    }
-  }
-
-  /// Create one series with sample hard coded data.
-  static List<charts.Series<LineSeriesData, int>> createTimeSeriesData(
-    List<LineSeriesData> x,
-    List<LineSeriesData> y,
-    List<LineSeriesData> z,
-  ) {
-    var data = <charts.Series<LineSeriesData, int>>[];
-
-    if (x.length == 0 && y.length == 0 && z.length == 0) {
-      data.add(new charts.Series<LineSeriesData, int>(
-        id: "line",
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (LineSeriesData sales, _) => sales.time,
-        measureFn: (LineSeriesData sales, _) => sales.value,
-        data: x,
-      ));
-      return data;
-    }
-
-    if (x.length > 0) {
-      var id = x[0].id;
-      data.add(new charts.Series<LineSeriesData, int>(
-        id: id,
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (LineSeriesData sales, _) => sales.time,
-        measureFn: (LineSeriesData sales, _) => sales.value,
-        data: x,
-      ));
-    }
-    if (y.length > 0) {
-      var id = x[0].id;
-      data.add(new charts.Series<LineSeriesData, int>(
-        id: id,
-        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (LineSeriesData sales, _) => sales.time,
-        measureFn: (LineSeriesData sales, _) => sales.value,
-        data: y,
-      ));
-    }
-    if (z.length > 0) {
-      var id = x[0].id;
-      data.add(new charts.Series<LineSeriesData, int>(
-        id: id,
-        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-        domainFn: (LineSeriesData sales, _) => sales.time,
-        measureFn: (LineSeriesData sales, _) => sales.value,
-        data: z,
-      ));
-    }
-    return data;
-  }
-
-  @override
-  StreamLineSeriesChartState createState() => new StreamLineSeriesChartState();
-}
-
-class StreamLineSeriesChartState extends State<StreamLineSeriesChart> {
-  @override
-  Widget build(BuildContext context) {
-    return new charts.LineChart(widget.seriesList, animate: false);
+    return source.toString();
   }
 }
