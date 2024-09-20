@@ -1,3 +1,6 @@
+## 0.7.0
+* Changed a minimum supported iOS version 13.0
+
 ## 0.6.0
 * Fix a config parameter issue
 
