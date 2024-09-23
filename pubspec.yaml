@@ -1,6 +1,6 @@
 name: awareframework_core
 description: The core classes of sensor modules on Aware Framework.
-version: 0.7.0
+version: 0.7.3
 homepage: https://awareframework.com/
 
 environment:

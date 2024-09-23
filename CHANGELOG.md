@@ -1,3 +1,6 @@
+## 0.7.1
+* Change the supported OS version from 13 to 12.
+
 ## 0.7.0
 * Changed a minimum supported iOS version 13.0
 
